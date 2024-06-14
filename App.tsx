@@ -1,118 +1,148 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
+  FlatList,
+  Pressable,
   StyleSheet,
   Text,
-  useColorScheme,
+  TextInput,
   View,
 } from 'react-native';
+import React, {useState} from 'react';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const App = () => {
+  const [directorName, setDirectorName] = useState<any>('');
+  const [movieName, setMovieName] = useState<any>('');
+  const [Data, setData] = useState<any>([]);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  const handleSubmit = () => {
+    if (directorName && movieName) {
+      const newData = {
+        id: movieName.length.toString(),
+        directorName: directorName,
+        movieName: movieName,
+      };
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+      setData([...Data, newData]);
+      setDirectorName('');
+      setMovieName('');
+    }
+  };
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const deleteData = (id: any) => {
+    const updatedData = Data.filter((data: any) => data.id !== id);
+    setData(updatedData);
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+    <View>
+      <Text style={styles.header}>Directors and Movies</Text>
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+      <View style={styles.textWrap}>
+        <TextInput
+          placeholder="Director name"
+          style={styles.inputOne}
+          value={directorName}
+          onChangeText={text => setDirectorName(text)}
+        />
+
+        <TextInput
+          placeholder="Movie name "
+          style={[styles.inputOne]}
+          value={movieName}
+          onChangeText={text => setMovieName(text)}
+        />
+
+        <Pressable onPress={() => handleSubmit()} style={styles.addBtn}>
+          <Text style={styles.add}>Add</Text>
+        </Pressable>
+      </View>
+
+      <FlatList
+        data={Data}
+        renderItem={({item}) => (
+          <View style={styles.container}>
+            <View style={styles.outputTable}>
+              <Text style={{color: 'black'}}>{item.directorName}</Text>
+            </View>
+            <View style={styles.outputTable}>
+              <Text style={{color: 'black'}}>{item.movieName}</Text>
+            </View>
+
+            <Pressable
+              onPress={() => deleteData(item.id)}
+              style={styles.dltBtn}>
+              <Text style={{color: 'white'}}>Delete</Text>
+            </Pressable>
+          </View>
+        )}
+        keyExtractor={item => item.id}
+      />
+    </View>
+  );
+};
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    gap: 10,
+    marginTop: 20,
+  },
+  addBtn: {
+    backgroundColor: 'green',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 2,
+    width: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dltBtn: {
+    backgroundColor: 'red',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 2,
+    width: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  add: {
+    color: 'white',
+    fontSize: 14,
+  },
+  header: {
+    fontSize: 30,
+    color: 'black',
+    fontWeight: 'medium',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  inputOne: {
+    width: '35%',
+    backgroundColor: '#D3D3D3',
+    paddingHorizontal: 15,
+    borderColor: 'black',
+    borderRadius: 2,
+  },
+
+  outputTable: {
+    width: '35%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#D3D3D3',
+    height: 50,
+    paddingHorizontal: 15,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 2,
+  },
+  textWrap: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 30,
+    marginHorizontal: 24,
+  },
+});
